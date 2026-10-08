@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /parking-page.shtml
+
+Sitemap: https://lululandkids.com/sitemap.xml
