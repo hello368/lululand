@@ -1,0 +1,570 @@
+<title>Lulu Land Media Picks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rammetto+One&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: sticky studio bar (title, tabs, filters) over a contact-sheet grid; a lightbox for close review. Brand tokens from lululandkids.com. */
+:root {
+  --bg: #f8f1e7;          /* cream */
+  --surface: #ffffff;
+  --ink: #022449;         /* navy */
+  --ink-soft: #55617a;
+  --line: #0b0706;        /* sticker outline */
+  --hair: #e4d9c8;
+  --rose: #df5a79;
+  --gold: #e9a214;
+  --sky: #1190df;
+  --teal: #00a6b0;
+  --chip: #fdf2dc;
+  --shadow: #0b0706;
+  --on-accent: #0b0706;
+  --scrim: rgba(2, 20, 41, .82);
+  --f-display: "Rammetto One", "Cooper Black", Georgia, serif;
+  --f-body: "Nunito", ui-rounded, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0b1626; --surface: #13233a; --ink: #f3ece2; --ink-soft: #a9b4c7; --line: #f3ece2;
+  --hair: #24364f; --chip: #2a2414; --shadow: #000000; --scrim: rgba(0, 0, 0, .86); color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0b1626; --surface: #13233a; --ink: #f3ece2; --ink-soft: #a9b4c7; --line: #f3ece2;
+  --hair: #24364f; --chip: #2a2414; --shadow: #000000; --scrim: rgba(0, 0, 0, .86); color-scheme: dark }
+
+* { box-sizing: border-box }
+[hidden] { display: none !important }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.45; }
+button, select, textarea { font: inherit; color: inherit }
+.wrap { max-width: 1280px; margin: 0 auto; padding-inline: 16px; }
+
+header.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 2px solid var(--line); }
+.bar .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; padding-block: 12px; }
+h1 { font-family: var(--f-display); font-weight: 400; font-size: 22px; margin: 0; letter-spacing: .01em; text-wrap: balance; }
+h1 small { display: block; font-family: var(--f-body); font-size: 12px; font-weight: 700; color: var(--ink-soft); letter-spacing: .08em; text-transform: uppercase; }
+.tabs { display: flex; gap: 6px; margin-left: auto; }
+.tab { border: 2px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 14px; font-weight: 800; cursor: pointer; box-shadow: 3px 3px 0 var(--shadow); }
+.tab[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+.tab .n { font-variant-numeric: tabular-nums; opacity: .75; margin-left: 4px; font-weight: 700; }
+.tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; width: 100%; }
+.chip { border: 1.5px solid var(--hair); background: var(--surface); border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 700; cursor: pointer; }
+.chip[aria-pressed="true"] { border-color: var(--line); background: var(--chip); }
+.tally { margin-left: auto; font-size: 13px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.tally b { color: var(--ink); }
+.btn { border: 2px solid var(--line); background: var(--gold); color: var(--on-accent); border-radius: 999px; padding: 5px 14px; font-weight: 800; font-size: 13px; cursor: pointer; box-shadow: 3px 3px 0 var(--shadow); }
+.btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--shadow); }
+:focus-visible { outline: 3px solid var(--sky); outline-offset: 2px; }
+
+.status { padding-block: 10px; font-size: 13px; color: var(--ink-soft); }
+.status[data-tone="warn"] { color: var(--rose); font-weight: 700; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; padding-block: 6px 40px; }
+.card { background: var(--surface); border: 2px solid var(--line); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; min-width: 0; }
+.card.on { box-shadow: 4px 4px 0 var(--gold); }
+.card.vid.on { box-shadow: 4px 4px 0 var(--sky); }
+.thumb { position: relative; aspect-ratio: 3 / 4; background: var(--hair); border: 0; padding: 0; cursor: zoom-in; display: block; width: 100%; overflow: hidden; }
+.thumb img, .thumb video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.badge { position: absolute; left: 8px; top: 8px; background: rgba(2, 36, 73, .78); color: #fff; font-size: 11px; font-weight: 800; padding: 2px 7px; border-radius: 999px; font-variant-numeric: tabular-nums; }
+.who { position: absolute; right: 8px; top: 8px; width: 22px; height: 22px; border-radius: 50%; border: 2px solid #fff; }
+.meta { padding: 8px 10px 10px; display: flex; flex-direction: column; gap: 6px; }
+.time { font-size: 11px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.picks { display: flex; gap: 6px; flex-wrap: wrap; }
+.pick { flex: 1 1 auto; border: 1.5px solid var(--hair); background: transparent; border-radius: 10px; padding: 5px 8px; font-size: 12.5px; font-weight: 800; cursor: pointer; white-space: nowrap; }
+.pick[aria-pressed="true"].hp { background: var(--gold); border-color: var(--line); color: var(--on-accent); }
+.pick[aria-pressed="true"].ad { background: var(--rose); border-color: var(--line); color: #fff; }
+.pick[aria-pressed="true"].so { background: var(--sky); border-color: var(--line); color: #fff; }
+.pick:disabled { opacity: .45; cursor: not-allowed; }
+.note-dot { font-size: 11px; color: var(--ink-soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.noprev { display: flex; align-items: center; justify-content: center; text-align: center; height: 100%; padding: 14px; font-size: 13px; font-weight: 700; color: var(--ink-soft); }
+.noprev.big { height: auto; background: var(--surface); color: var(--ink); border: 2px solid var(--line); border-radius: 14px; padding: 28px; max-width: 420px; font-size: 16px; }
+.chip.rec { border-color: var(--gold); }
+.chip.rec[aria-pressed="true"] { background: var(--gold); color: var(--on-accent); border-color: var(--line); }
+.ribbon { position: absolute; left: 8px; bottom: 8px; background: var(--gold); color: var(--on-accent); border: 1.5px solid var(--line); font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 999px; font-variant-numeric: tabular-nums; }
+.sugg-line { font-size: 12px; font-weight: 700; color: var(--ink); }
+.sugg-line span { color: var(--ink-soft); font-weight: 600; }
+.recnote { border: 2px solid var(--line); background: var(--chip); border-radius: 16px; padding: 14px 16px; margin-block: 4px 12px; display: flex; flex-direction: column; gap: 8px; }
+.recnote h2 { margin: 0; font-size: 15px; }
+.recnote p { margin: 0; max-width: 72ch; color: var(--ink-soft); font-size: 13.5px; }
+.recnote ol { margin: 0; padding-left: 20px; display: grid; gap: 4px; font-size: 13.5px; }
+.recnote button.link { background: none; border: 0; padding: 0; color: var(--sky); font-weight: 800; cursor: pointer; text-decoration: underline; }
+.why { border: 2px solid var(--gold); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 8px; background: var(--chip); }
+.why p { margin: 0; font-size: 14px; }
+.why .sugg { font-weight: 800; font-size: 13px; }
+.why .btn { align-self: flex-start; }
+.ads-head { display: flex; flex-direction: column; gap: 8px; padding-block: 10px 14px; }
+.ads-head h2 { margin: 0; font-family: var(--f-display); font-weight: 400; font-size: 20px; }
+.ads-head p { margin: 0; color: var(--ink-soft); max-width: 70ch; font-size: 13.5px; }
+.ads-filter { display: flex; gap: 8px; flex-wrap: wrap; }
+.ads-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; padding-bottom: 40px; }
+.ad { background: var(--surface); border: 2px solid var(--line); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; min-width: 0; box-shadow: 4px 4px 0 var(--shadow); }
+.ad video { width: 100%; aspect-ratio: 9 / 16; background: #000; display: block; }
+.ad .body { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 6px; }
+.ad .row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.ad .len { background: var(--ink); color: var(--bg); font-weight: 800; font-size: 11px; padding: 2px 8px; border-radius: 999px; font-variant-numeric: tabular-nums; }
+.ad .kind { border: 1.5px solid var(--hair); font-weight: 800; font-size: 11px; padding: 1px 8px; border-radius: 999px; color: var(--ink-soft); }
+.ad .kind.offer { border-color: var(--rose); color: var(--rose); }
+.ad h3 { margin: 0; font-size: 15px; line-height: 1.3; }
+.ad .meta2 { font-size: 12px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.ad .btn { align-self: stretch; text-align: center; }
+.ad .btn:disabled { opacity: .5; cursor: progress; }
+.ad a.btn { text-decoration: none; display: block; }
+.dl-alt { font-size: 12px; font-weight: 800; color: var(--sky); text-align: center; }
+.empty { padding: 40px 0; text-align: center; color: var(--ink-soft); }
+.ads-group { grid-column: 1 / -1; margin: 10px 0 -2px; display: flex; flex-direction: column; gap: 2px; padding: 12px 16px; border-radius: 14px; border: 2px solid var(--hair); }
+.ads-group strong { font-size: 17px; font-weight: 800; }
+.ads-group span { font-size: 13px; color: var(--ink-soft); font-weight: 700; }
+.ads-group.is-new { border-color: var(--line); background: var(--rose); color: #fff; box-shadow: 4px 4px 0 var(--shadow); }
+.ads-group.is-new span { color: #fff; opacity: .9; }
+.ad { position: relative; }
+.ad.is-new { box-shadow: 4px 4px 0 var(--rose); }
+.date-tag { position: absolute; z-index: 1; left: 10px; top: 10px; background: var(--rose); color: #fff; border: 2px solid var(--line); border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 800; letter-spacing: .04em; font-variant-numeric: tabular-nums; pointer-events: none; }
+
+/* lightbox */
+.lb { position: fixed; inset: 0; z-index: 20; background: var(--scrim); display: grid; grid-template-columns: minmax(0, 1fr) 320px; }
+.lb[hidden] { display: none !important; }
+.stage { position: relative; display: flex; align-items: center; justify-content: center; padding: calc(16px + env(safe-area-inset-top, 0px)) 16px calc(16px + env(safe-area-inset-bottom, 0px)); min-width: 0; }
+.stage img, .stage video { max-width: 100%; max-height: 100%; border-radius: 12px; background: #000; }
+.nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,.92); color: #022449; border: 2px solid #0b0706; width: 44px; height: 44px; border-radius: 50%; font-size: 20px; font-weight: 800; cursor: pointer; }
+.nav.prev { left: 12px } .nav.next { right: 12px }
+.side { background: var(--surface); border-left: 2px solid var(--line); padding: calc(18px + env(safe-area-inset-top, 0px)) 18px calc(18px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 14px; overflow-y: auto; min-width: 0; }
+.side h2 { font-size: 13px; margin: 0; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
+.side .title { font-weight: 800; word-break: break-word; }
+.side .picks .pick { padding: 9px 10px; font-size: 14px; }
+.side label { font-size: 12px; font-weight: 800; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .06em; display: flex; flex-direction: column; gap: 6px; }
+.side select, .side textarea { border: 1.5px solid var(--hair); border-radius: 10px; padding: 8px 10px; background: var(--bg); font-weight: 600; text-transform: none; letter-spacing: 0; }
+.side textarea { min-height: 96px; resize: vertical; }
+.side a { color: var(--sky); font-weight: 800; }
+.close { align-self: flex-end; border: 2px solid var(--line); background: var(--surface); border-radius: 999px; padding: 4px 12px; font-weight: 800; cursor: pointer; }
+.byline { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-soft); }
+.byline img { width: 22px; height: 22px; border-radius: 50%; }
+.toast { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 8px 16px; border-radius: 999px; font-weight: 800; font-size: 13px; z-index: 30; }
+.copybox { width: 100%; min-height: 120px; font-size: 12px; }
+
+@media (max-width: 760px) {
+  .lb { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) auto; }
+  .side { border-left: 0; border-top: 2px solid var(--line); max-height: 52vh; padding-top: 14px; }
+  .tabs { margin-left: 0; }
+  .tally { margin-left: 0; width: 100%; }
+  .grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important } }
+.gate { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px 16px; }
+.gate form { background: var(--surface); border: 2px solid var(--line); border-radius: 20px; box-shadow: 5px 5px 0 var(--shadow); padding: 26px 22px; width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 12px; text-align: center; }
+.gate h1 { font-size: 22px; }
+.gate p { margin: 0; color: var(--ink-soft); font-size: 14px; }
+.gate input { border: 2px solid var(--line); border-radius: 12px; padding: 10px 12px; font: 800 22px var(--f-body); letter-spacing: .3em; text-align: center; background: var(--bg); color: var(--ink); width: 100%; }
+.gate .btn { font-size: 15px; padding: 9px 14px; }
+.gate .err { color: var(--rose); font-weight: 800; font-size: 13px; min-height: 1.2em; }
+.gate:not([hidden]) ~ header, .gate:not([hidden]) ~ main { display: none !important; }
+</style>
+
+<div class="gate" id="gate">
+  <form id="gate-form" autocomplete="off">
+    <h1><small>Lulu Land</small>Media Picks</h1>
+    <p>Enter the access code to view the shoot and the ads.</p>
+    <input id="gate-pin" type="password" inputmode="numeric" maxlength="12" aria-label="Access code" required>
+    <div class="err" id="gate-err" role="alert"></div>
+    <button class="btn" type="submit">Enter</button>
+  </form>
+</div>
+
+<header class="bar">
+  <div class="wrap">
+    <h1><small>Lulu Land · Oct 10 shoot</small>Media Picks</h1>
+    <div class="tabs" role="tablist" aria-label="Media type">
+      <button class="tab" role="tab" id="tab-image" aria-selected="true">Photos<span class="n" id="n-image">0</span></button>
+      <button class="tab" role="tab" id="tab-video" aria-selected="false">Videos<span class="n" id="n-video">0</span></button>
+      <button class="tab" role="tab" id="tab-ads" aria-selected="false">Ads<span class="n" id="n-ads">0</span></button>
+    </div>
+    <div class="tools" id="tools">
+      <button class="chip rec" data-filter="rec" aria-pressed="false">✨ Claude’s picks</button>
+      <button class="chip" data-filter="all" aria-pressed="true">All</button>
+      <button class="chip" data-filter="picked" aria-pressed="false">Picked</button>
+      <button class="chip" data-filter="open" aria-pressed="false">Not picked</button>
+      <span class="tally" id="tally"></span>
+      <button class="btn" id="copy">Copy picked list</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="status" id="status">Loading the shoot…</div>
+  <section class="recnote" id="recnote" hidden></section>
+  <section id="ads" hidden>
+    <div class="ads-head">
+      <h2>Finished ads</h2>
+      <p>Vertical 9:16 (1080×1920) for Reels, TikTok and Meta. Each ad ends on Lulu Land’s location; the birthday ads show (818) 668-3342. Ads with a NEW date tag were added on that day. Tap Download to save the MP4.</p>
+      <div class="ads-filter" role="group" aria-label="Length">
+        <button class="chip" data-len="all" aria-pressed="true">All</button>
+        <button class="chip rec" data-len="new" aria-pressed="false">🆕 New · Oct 20</button>
+        <button class="chip" data-len="bday" aria-pressed="false">🎂 Birthday parties</button>
+        <button class="chip" data-len="15" aria-pressed="false">15 seconds</button>
+        <button class="chip" data-len="30" aria-pressed="false">30 seconds</button>
+      </div>
+    </div>
+    <div class="ads-grid" id="ads-grid"></div>
+  </section>
+  <div class="grid" id="grid" aria-live="polite"></div>
+  <textarea class="copybox" id="copybox" hidden readonly aria-label="Picked list"></textarea>
+</main>
+
+<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Review">
+  <div class="stage" id="stage">
+    <button class="nav prev" id="prev" aria-label="Previous">‹</button>
+    <div id="stage-media" style="display:contents"></div>
+    <button class="nav next" id="next" aria-label="Next">›</button>
+  </div>
+  <aside class="side">
+    <button class="close" id="close">Close ✕</button>
+    <div><h2 id="lb-kind">Photo</h2><div class="title" id="lb-title"></div><div class="time" id="lb-time"></div></div>
+    <div class="why" id="lb-rec" hidden>
+      <h2>✨ Why Claude picked it</h2>
+      <p id="lb-rec-why"></p>
+      <p class="sugg" id="lb-rec-use"></p>
+      <button class="btn" id="lb-rec-apply" type="button">Use this suggestion</button>
+    </div>
+    <div class="picks" id="lb-picks"></div>
+    <label id="lb-section-wrap">Use on the site
+      <select id="lb-section">
+        <option value="">Not decided</option>
+        <option value="home-hero">Home · top hero</option>
+        <option value="home-experiences">Home · experiences</option>
+        <option value="home-birthdays">Home · birthday section</option>
+        <option value="create">Create page</option>
+        <option value="parties">Birthday Parties page</option>
+        <option value="gallery">Gallery page</option>
+        <option value="visit">Visit Us page</option>
+      </select>
+    </label>
+    <label>Notes for editing
+      <textarea id="lb-note" placeholder="Crop, brighten, cut 0:03–0:12, add caption…"></textarea>
+    </label>
+    <div class="byline" id="lb-by" hidden></div>
+    <a id="lb-drive" href="#" target="_blank" rel="noopener">Open original in Google Drive ↗</a>
+  </aside>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const state = { media: [], tab: "image", filter: "rec", picks: {}, uid: null, canWrite: true, db: null, user: null, open: -1 };
+  state.ads = []; state.adLen = "all"; state.downloads = null;
+  try { const t = localStorage.getItem("mp-tab"); if (t === "video" || t === "image" || t === "ads") state.tab = t; } catch (e) {}
+  if (location.hash === "#ads") state.tab = "ads";
+
+  const SECTIONS = Object.fromEntries([...document.querySelectorAll("#lb-section option")].map(o => [o.value, o.textContent]));
+  const USES = { ad: "Ad", social: "Social" };
+  const useLabel = (m) => m.rec ? (m.kind === "image" ? SECTIONS[m.rec.use] : USES[m.rec.use]) : "";
+  const isPicked = (m) => { const p = state.picks[m.id] || {}; return m.kind === "image" ? !!p.homepage : !!(p.ad || p.social); };
+  const view = () => {
+    const list = state.media.filter(m => m.kind === state.tab).filter(m =>
+      state.filter === "all" ? true : state.filter === "rec" ? !!m.rec : state.filter === "picked" ? isPicked(m) : !isPicked(m));
+    return state.filter === "rec" ? list.sort((a, b) => a.rec.rank - b.rec.rank) : list;
+  };
+
+  function renderRecNote() {
+    const box = $("#recnote"); box.textContent = "";
+    if (state.filter !== "rec") { box.hidden = true; return; }
+    const recs = state.media.filter(m => m.kind === state.tab && m.rec).sort((a, b) => a.rec.rank - b.rec.rank);
+    const h = document.createElement("h2"), p = document.createElement("p");
+    if (state.tab === "image") {
+      h.textContent = `✨ Claude’s ${recs.length} picks for the website`;
+      p.textContent = "Ranked from all " + state.media.filter(m => m.kind === "image").length + " photos on sharpness, light, a clear face or finished piece, and how well it explains Lulu Land. Each one has a suggested spot on the site. Open a photo and tap “Use this suggestion” to add it to the retouch list.";
+      box.append(h, p);
+    } else {
+      h.textContent = "✨ Claude’s ad cut idea (about 25 seconds)";
+      p.textContent = "Vertical 9:16, for Reels, TikTok and Meta ads. The shots below are ranked; the first six make this sequence:";
+      const ol = document.createElement("ol");
+      recs.filter(m => m.rec.use === "ad").forEach(m => {
+        const li = document.createElement("li"); const b = document.createElement("button"); b.className = "link"; b.type = "button";
+        b.textContent = m.label; b.onclick = () => openLb(m.id);
+        li.append(b, document.createTextNode(" — " + m.rec.cut + ". " + m.rec.why.split(".")[0] + "."));
+        ol.appendChild(li);
+      });
+      const end = document.createElement("li"); end.textContent = "End card: Lulu Land logo, “Walk in & create · Westfield Topanga, 2nd floor”, lululandkids.com."; ol.appendChild(end);
+      box.append(h, p, ol);
+    }
+    box.hidden = false;
+  }
+
+  function toast(msg) { const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 2200); }
+  function setStatus(msg, tone) { const s = $("#status"); s.textContent = msg || ""; s.hidden = !msg; if (tone) s.dataset.tone = tone; else delete s.dataset.tone; }
+
+  // ---------- rendering ----------
+  function pickButtons(m, big) {
+    const p = state.picks[m.id] || {};
+    const defs = m.kind === "image" ? [["homepage", "hp", big ? "★ Homepage retouch" : "★ Retouch"]] : [["ad", "ad", "Ad"], ["social", "so", "Social"]];
+    return defs.map(([key, cls, label]) => {
+      const b = document.createElement("button");
+      b.className = "pick " + cls; b.textContent = label; b.type = "button";
+      b.setAttribute("aria-pressed", p[key] ? "true" : "false");
+      b.disabled = !state.db || !state.canWrite;
+      b.addEventListener("click", (e) => { e.stopPropagation(); toggle(m, key); });
+      return b;
+    });
+  }
+
+  async function avatarFor(id) {
+    if (!id || !state.user) return null;
+    const ps = await state.user.profiles([id]);
+    return ps[id];
+  }
+
+  function renderAds() {
+    const g = $("#ads-grid"); g.textContent = "";
+    document.querySelectorAll("[data-len]").forEach(c => c.setAttribute("aria-pressed", c.dataset.len === state.adLen));
+    const list = state.ads.filter(a => state.adLen === "all" || (state.adLen === "new" ? a.isNew : state.adLen === "bday" ? a.kind === "Birthday offer" : String(a.length) === state.adLen));
+    let lastGroup = null;
+    const fmtDay = (iso, long) => new Date(iso + "T12:00:00").toLocaleDateString("en-US", long ? { month: "long", day: "numeric", year: "numeric" } : { month: "short", day: "numeric" });
+    if (!list.length) { const e = document.createElement("div"); e.className = "empty"; e.textContent = state.adsError || "Loading the ads…"; g.appendChild(e); return; }
+    list.forEach((a) => {
+      const grp = a.added || "old";
+      if (grp !== lastGroup) {
+        lastGroup = grp; const n = list.filter(x => (x.added || "old") === grp).length;
+        const h = document.createElement("div"); h.className = "ads-group" + (grp !== "old" ? " is-new" : "");
+        const t = document.createElement("strong"); const sub = document.createElement("span");
+        if (grp !== "old") { t.textContent = `🆕 Added ${fmtDay(grp, true)} · ${n} ads`; sub.textContent = "New concepts, new music, new transitions"; }
+        else { t.textContent = `Earlier ads · ${n}`; sub.textContent = "Kids-pop vocal versions"; }
+        h.append(t, sub); g.appendChild(h);
+      }
+      const card = document.createElement("article"); card.className = "ad" + (a.isNew ? " is-new" : "");
+      if (a.added) { const tag = document.createElement("span"); tag.className = "date-tag"; tag.textContent = "NEW · " + fmtDay(a.added).toUpperCase(); card.appendChild(tag); }
+      const v = document.createElement("video"); v.controls = true; v.playsInline = true; v.preload = "none"; v.poster = a.poster; v.src = a.url;
+      const body = document.createElement("div"); body.className = "body";
+      const row = document.createElement("div"); row.className = "row";
+      const len = document.createElement("span"); len.className = "len"; len.textContent = a.length + "s";
+      const kind = document.createElement("span"); kind.className = "kind" + (a.kind === "Birthday offer" ? " offer" : ""); kind.textContent = a.kind;
+      row.append(len, kind);
+      const h = document.createElement("h3"); h.textContent = a.title;
+      const m = document.createElement("div"); m.className = "meta2"; m.textContent = (a.style ? "♪ " + a.style + " · " : "") + a.file + " · " + a.mb + " MB";
+      const abs = new URL(a.url, location.href).href;
+      const link = document.createElement("a"); link.href = abs; link.download = a.file; link.target = "_blank"; link.rel = "noopener";
+      const b = document.createElement("button"); b.className = "btn"; b.type = "button"; b.textContent = "⬇ Download MP4";
+      b.onclick = async () => {
+        b.disabled = true; b.textContent = "Preparing…";
+        try {
+          const blob = await (await fetch(a.url)).blob();
+          await state.downloads.save({ filename: a.file, data: blob });
+          toast("Saved " + a.file);
+        } catch (e) {
+          if (!e || e.code !== "declined") { toast("Opening the video file to save it…"); window.open(abs, "_blank", "noopener"); }
+        } finally { b.disabled = false; b.textContent = "⬇ Download MP4"; }
+      };
+      body.append(row, h, m);
+      if (state.downloads) {
+        link.className = "dl-alt"; link.textContent = "Didn’t download? Open the video file ↗";
+        body.append(b, link);
+      } else {
+        link.className = "btn"; link.textContent = "⬇ Download MP4";
+        const n = document.createElement("div"); n.className = "meta2";
+        n.textContent = "Opens the video. Phone: tap Share or ⋯ → Save video. Computer: right-click → Save video as.";
+        body.append(link, n);
+      }
+      card.append(v, body); g.appendChild(card);
+    });
+  }
+
+  function render() {
+    const imgs = state.media.filter(m => m.kind === "image"), vids = state.media.filter(m => m.kind === "video");
+    $("#n-image").textContent = imgs.length; $("#n-video").textContent = vids.length; $("#n-ads").textContent = state.ads.length;
+    $("#tab-image").setAttribute("aria-selected", state.tab === "image"); $("#tab-video").setAttribute("aria-selected", state.tab === "video"); $("#tab-ads").setAttribute("aria-selected", state.tab === "ads");
+    const onAds = state.tab === "ads";
+    $("#ads").hidden = !onAds; $("#tools").hidden = onAds; $("#grid").hidden = onAds;
+    if (onAds) { $("#recnote").hidden = true; renderAds(); return; }
+    document.querySelectorAll(".chip[data-filter]").forEach(c => c.setAttribute("aria-pressed", c.dataset.filter === state.filter));
+    const hp = imgs.filter(m => state.picks[m.id]?.homepage).length;
+    const ad = vids.filter(m => state.picks[m.id]?.ad).length, so = vids.filter(m => state.picks[m.id]?.social).length;
+    $("#tally").innerHTML = state.tab === "image"
+      ? `<b>${hp}</b> of ${imgs.length} photos picked for retouch`
+      : `<b>${ad}</b> for ads · <b>${so}</b> for social · ${vids.length} videos`;
+
+    renderRecNote();
+    const grid = $("#grid"); grid.textContent = "";
+    const list = view();
+    if (!list.length) {
+      const e = document.createElement("div"); e.className = "empty";
+      e.textContent = state.filter === "rec" ? "No suggestions for this tab." : state.filter === "picked" ? "Nothing picked yet. Tap ★ Homepage retouch on a photo, or Ad / Social on a video." : "Every item here is picked.";
+      grid.appendChild(e); return;
+    }
+    const frag = document.createDocumentFragment();
+    list.forEach((m) => {
+      const p = state.picks[m.id] || {};
+      const card = document.createElement("article");
+      card.className = "card" + (m.kind === "video" ? " vid" : "") + (isPicked(m) ? " on" : "");
+      const th = document.createElement("button"); th.className = "thumb"; th.type = "button";
+      th.setAttribute("aria-label", "Open " + m.label);
+      if (m.kind === "image") {
+        const img = document.createElement("img"); img.loading = "lazy"; img.decoding = "async"; img.alt = m.label; img.src = m.src;
+        th.appendChild(img);
+      } else if (!m.src) {
+        const ph = document.createElement("span"); ph.className = "noprev"; ph.textContent = "Too large to preview here. Open it in Drive."; th.appendChild(ph);
+        const bd = document.createElement("span"); bd.className = "badge"; bd.textContent = "▶ Drive"; th.appendChild(bd);
+      } else {
+        const v = document.createElement("img"); v.loading = "lazy"; v.decoding = "async"; v.alt = m.label; v.src = m.poster;
+        th.appendChild(v);
+        const bd = document.createElement("span"); bd.className = "badge"; bd.textContent = "▶ " + fmtDur(m.duration); th.appendChild(bd);
+      }
+      if (p.by && isPicked(m)) {
+        const w = document.createElement("img"); w.className = "who"; w.alt = "";
+        avatarFor(p.by).then(pr => { if (pr) { w.src = pr.avatarUrl; w.title = "Picked by " + (pr.name || "a teammate"); } });
+        th.appendChild(w);
+      }
+      if (m.rec) { const r = document.createElement("span"); r.className = "ribbon"; r.textContent = "✨ #" + m.rec.rank; r.title = "Claude’s pick"; th.appendChild(r); }
+      th.addEventListener("click", () => openLb(m.id));
+      const meta = document.createElement("div"); meta.className = "meta";
+      const t = document.createElement("div"); t.className = "time"; t.textContent = m.label + (p.section ? " · " + SECTIONS[p.section] : "");
+      const pk = document.createElement("div"); pk.className = "picks"; pickButtons(m).forEach(b => pk.appendChild(b));
+      meta.append(t);
+      if (m.rec) { const s = document.createElement("div"); s.className = "sugg-line"; const sp = document.createElement("span"); sp.textContent = "Suggested: "; s.append(sp, document.createTextNode(useLabel(m))); meta.appendChild(s); }
+      meta.append(pk);
+      if (p.note) { const n = document.createElement("div"); n.className = "note-dot"; n.textContent = "✎ " + p.note; meta.appendChild(n); }
+      card.append(th, meta); frag.appendChild(card);
+    });
+    grid.appendChild(frag);
+    if (state.open >= 0) fillLbSide();
+  }
+
+  function fmtDur(s) { s = Math.round(s || 0); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); }
+
+  // ---------- lightbox ----------
+  function openLb(id) {
+    const list = view(); const i = list.findIndex(m => m.id === id); if (i < 0) return;
+    state.open = i; state.openId = id; $("#lb").hidden = false; fillLb(); $("#close").focus();
+  }
+  function closeLb() { $("#lb").hidden = true; state.open = -1; $("#stage-media").textContent = ""; }
+  function step(d) { const list = view(); if (!list.length) return; state.open = (state.open + d + list.length) % list.length; state.openId = list[state.open].id; fillLb(); }
+  function current() { return state.media.find(m => m.id === state.openId); }
+  function fillLb() {
+    const m = current(); if (!m) return closeLb();
+    const box = $("#stage-media"); box.textContent = "";
+    if (m.kind === "image") { const img = document.createElement("img"); img.src = m.src; img.alt = m.label; box.appendChild(img); }
+    else if (!m.src) { const ph = document.createElement("a"); ph.className = "noprev big"; ph.href = m.drive; ph.target = "_blank"; ph.rel = "noopener"; ph.textContent = "This video is too large to preview here. Open it in Google Drive ↗"; box.appendChild(ph); }
+    else { const v = document.createElement("video"); v.src = m.src; v.controls = true; v.playsInline = true; v.preload = "auto"; if (m.poster) v.poster = m.poster; box.appendChild(v); }
+    $("#lb-kind").textContent = m.kind === "image" ? "Photo" : (m.duration ? "Video · " + fmtDur(m.duration) : "Video");
+    $("#lb-title").textContent = m.title; $("#lb-time").textContent = m.label;
+    $("#lb-drive").href = m.drive;
+    $("#lb-section-wrap").hidden = m.kind !== "image";
+    $("#lb-rec").hidden = !m.rec;
+    if (m.rec) {
+      $("#lb-rec-why").textContent = m.rec.why;
+      $("#lb-rec-use").textContent = "Suggested: " + useLabel(m) + (m.rec.cut ? " · " + m.rec.cut : "");
+    }
+    $("#lb-note").value = (state.picks[m.id] || {}).note || "";
+    fillLbSide();
+  }
+  function fillLbSide() {
+    const m = current(); if (!m) return;
+    const p = state.picks[m.id] || {};
+    const box = $("#lb-picks"); box.textContent = ""; pickButtons(m, true).forEach(b => box.appendChild(b));
+    const sel = $("#lb-section"); sel.value = p.section || ""; sel.disabled = !state.db || !state.canWrite;
+    $("#lb-note").disabled = !state.db || !state.canWrite;
+    $("#lb-rec-apply").disabled = !state.db || !state.canWrite;
+    if (document.activeElement !== $("#lb-note")) $("#lb-note").value = p.note || "";
+    const by = $("#lb-by");
+    if (p.by) { avatarFor(p.by).then(pr => { by.textContent = ""; if (!pr) return; const im = document.createElement("img"); im.src = pr.avatarUrl; im.alt = ""; const s = document.createElement("span"); s.textContent = "Last change by " + (pr.name || "a teammate"); by.append(im, s); by.hidden = false; }); }
+    else by.hidden = true;
+  }
+
+  // ---------- writes (one at a time per doc) ----------
+  const chains = {};
+  function write(m, patch) {
+    if (!state.db) return;
+    const prev = state.picks[m.id] || {};
+    const next = { kind: m.kind, homepage: false, ad: false, social: false, section: "", note: "", ...prev, ...patch, by: state.uid || prev.by || null, at: Date.now() };
+    state.picks[m.id] = next; render();
+    chains[m.id] = (chains[m.id] || Promise.resolve()).then(() => state.db.doc("picks/" + m.id).set(next)).catch((e) => {
+      if (e && e.code === "invalid_argument") { state.canWrite = false; setStatus("You can look through the shoot, but picking needs Contributor access. Ask the owner to share it with you as a Contributor.", "warn"); }
+      else if (e && e.code === "quota_exceeded") setStatus("The pick list is full. Clear some picks and try again.", "warn");
+      else toast("Couldn’t save that pick. Check your connection and try again.");
+      state.picks[m.id] = prev; render();
+    });
+  }
+  function toggle(m, key) { const p = state.picks[m.id] || {}; write(m, { [key]: !p[key] }); toast(!p[key] ? "Picked" : "Unpicked"); }
+
+  // ---------- events ----------
+  $("#tab-image").onclick = () => { state.tab = "image"; try { localStorage.setItem("mp-tab", "image"); } catch (e) {} render(); };
+  $("#tab-video").onclick = () => { state.tab = "video"; try { localStorage.setItem("mp-tab", "video"); } catch (e) {} render(); };
+  $("#tab-ads").onclick = () => { state.tab = "ads"; try { localStorage.setItem("mp-tab", "ads"); } catch (e) {} render(); };
+  document.querySelectorAll("[data-len]").forEach(c => c.onclick = () => { state.adLen = c.dataset.len; renderAds(); });
+  document.querySelectorAll(".chip[data-filter]").forEach(c => c.onclick = () => { state.filter = c.dataset.filter; render(); });
+  $("#close").onclick = closeLb; $("#prev").onclick = () => step(-1); $("#next").onclick = () => step(1);
+  $("#lb").addEventListener("click", (e) => { if (e.target.id === "stage") closeLb(); });
+  document.addEventListener("keydown", (e) => {
+    if ($("#lb").hidden) return;
+    if (e.target.tagName === "TEXTAREA" || e.target.tagName === "SELECT") { if (e.key === "Escape") e.target.blur(); return; }
+    if (e.key === "Escape") closeLb(); else if (e.key === "ArrowLeft") step(-1); else if (e.key === "ArrowRight") step(1);
+    else if (e.key === "p" || e.key === "P") { const m = current(); if (m) toggle(m, m.kind === "image" ? "homepage" : "ad"); }
+  });
+  $("#lb-section").onchange = (e) => { const m = current(); if (m) write(m, { section: e.target.value, ...(e.target.value ? { homepage: true } : {}) }); };
+  $("#lb-rec-apply").onclick = () => {
+    const m = current(); if (!m || !m.rec) return;
+    const p = state.picks[m.id] || {};
+    const note = p.note || (m.rec.cut ? "Cut: " + m.rec.cut : "");
+    if (m.kind === "image") write(m, { homepage: true, section: m.rec.use, note });
+    else write(m, { [m.rec.use]: true, note });
+    toast("Added to the " + (m.kind === "image" ? "retouch list" : useLabel(m) + " list"));
+  };
+  let noteT; $("#lb-note").addEventListener("input", () => { clearTimeout(noteT); noteT = setTimeout(saveNote, 700); });
+  $("#lb-note").addEventListener("blur", () => { clearTimeout(noteT); saveNote(); });
+  function saveNote() { const m = current(); if (!m) return; const v = $("#lb-note").value.slice(0, 1000); if (v !== ((state.picks[m.id] || {}).note || "")) write(m, { note: v }); }
+
+  $("#copy").onclick = async () => {
+    const lines = [];
+    const imgs = state.media.filter(m => m.kind === "image" && state.picks[m.id]?.homepage);
+    const vids = state.media.filter(m => m.kind === "video" && (state.picks[m.id]?.ad || state.picks[m.id]?.social));
+    lines.push(`PHOTOS FOR HOMEPAGE RETOUCH (${imgs.length})`);
+    imgs.forEach(m => { const p = state.picks[m.id]; lines.push(`- ${m.title}${p.section ? " → " + SECTIONS[p.section] : ""}${p.note ? " — " + p.note : ""}\n  ${m.drive}`); });
+    lines.push("", `VIDEOS (${vids.length})`);
+    vids.forEach(m => { const p = state.picks[m.id]; const use = [p.ad && "Ad", p.social && "Social"].filter(Boolean).join(" + "); lines.push(`- [${use}] ${m.title} (${fmtDur(m.duration)})${p.note ? " — " + p.note : ""}\n  ${m.drive}`); });
+    const text = lines.join("\n");
+    try { await navigator.clipboard.writeText(text); toast("Picked list copied"); $("#copybox").hidden = true; }
+    catch (e) { const b = $("#copybox"); b.value = text; b.hidden = false; b.focus(); b.select(); toast("Select the list below and copy it"); }
+  };
+
+  // ---------- boot (after the access code) ----------
+  const boot = () => {
+  fetch("media.json").then(r => r.json()).then((data) => {
+    state.media = data; setStatus(""); render();
+  }).catch(() => setStatus("The media list didn’t load. Reload the page to try again.", "warn"));
+  fetch("ads.json").then(r => r.json()).then((data) => { state.ads = data; render(); })
+    .catch(() => { state.adsError = "The ads list didn’t load. Reload the page to try again."; render(); });
+
+  const use = (n) => (window.claude && window.claude.use) ? Promise.resolve(window.claude.use(n)).catch(() => null) : Promise.resolve(null);
+  use("downloads").then((d) => { state.downloads = d; if (state.tab === "ads") render(); });
+  (async () => {
+    const user = await use("user");
+    state.user = user || null;
+    if (user) {
+      state.uid = await user.id();
+      const can = await user.can("data.write");
+      if (can === false) { state.canWrite = false; setStatus("You can look through the shoot. Picking needs Contributor access from the owner.", "warn"); }
+    }
+    const db = await use("db");
+    if (!db) { setStatus("Picks are read-only here: sign in to claude.ai to pick and see the team’s picks.", "warn"); render(); return; }
+    state.db = db;
+    db.collection("picks").onSnapshot((snap) => {
+      const next = {}; snap.docs.forEach(d => { next[d.id] = d.data(); });
+      state.picks = next; render();
+    }, (e) => { if (e.code !== "revoked") setStatus("Live picks stopped updating. Reload the page to reconnect.", "warn"); });
+    render();
+  })();
+  };
+
+  // Light access code: keeps casual visitors out. Real access is the artifact's Share setting.
+  const PIN_HASH = "432806b455df1d94d363dbc1fa34f501cc03270b65a107560e4f3d843b0ed429";
+  const hashPin = async (v) => {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("lululand:" + v));
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+  };
+  const unlock = () => { $("#gate").hidden = true; boot(); };
+  let saved = null; try { saved = localStorage.getItem("ll-gate"); } catch (e) {}
+  if (saved === PIN_HASH) unlock();
+  else {
+    $("#gate-pin").focus();
+    $("#gate-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      let h = ""; try { h = await hashPin($("#gate-pin").value.trim()); } catch (err) {}
+      if (h === PIN_HASH) { try { localStorage.setItem("ll-gate", h); } catch (err) {} unlock(); }
+      else { $("#gate-err").textContent = "That code isn’t right. Try again."; $("#gate-pin").select(); }
+    });
+  }
+})();
+</script>
